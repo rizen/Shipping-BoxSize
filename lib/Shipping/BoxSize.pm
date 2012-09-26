@@ -119,7 +119,7 @@ sub pack_item_in_box {
 				next if ( !$cursor_type );
 				$this_cursor = $box->cursors->{$cursor_type};
 				$location    = $this_cursor->location_as_string;
-				next if ( $duplicate{$location} eq 1 );    # some cursors are stacked in same spot
+				next if ( $duplicate{$location} );    # some cursors are stacked in same spot
 
 				$stat_count_cursor++;
 
