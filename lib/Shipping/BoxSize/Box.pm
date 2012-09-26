@@ -135,7 +135,6 @@ around BUILDARGS => sub {
 sub BUILD {
     my $self = shift;
     foreach my $cursor_type ( @{ $self->cursor_types } ) {
-        warn $cursor_type;
         $self->cursors->{$cursor_type} = Shipping::BoxSize::Cursor->new;
 	} 
 };
