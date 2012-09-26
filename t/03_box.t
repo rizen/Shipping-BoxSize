@@ -18,12 +18,13 @@ is $box->volume_remaining, 3*7*2, 'volume_remaining';
 
 ok exists $box->space->[0][0][0], 'low limit of space initialized';
 ok exists $box->space->[1][2][6], 'high limit of space initialized';
+ok !exists $box->space->[1][2][7], 'space does not go too far';
 
 ok !$box->enable_stats, 'stats disabled by default';
 
 cmp_deeply [$box->dimensions], [2,3,7], 'dimensions';
 
-is scalar(@{ keys %{$box->{cursors}}}), 4, 'cursors initialized';
+is scalar(keys %{$box->cursors}), 4, 'cursors initialized';
 
 is scalar(@{$box->packing_list}), 0, 'packing_list initialized';
 

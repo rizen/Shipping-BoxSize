@@ -82,30 +82,26 @@ has stats => (
 has packing_list => (
     is          => 'rw',
     isa         => 'ArrayRef',
+    default     => sub { [] },
 );
 
 
 around BUILDARGS => sub {
     my ($orig, $class, %args) = @_;
-    my $x = floor($args{x});
-    my $y = floor($args{y});
-    my $z = floor($args{z});
-    my $rotation = $args{rotation} || 'XYZ';
     my $scale = $args{scale} || 1;
+    my $rotation = $args{rotation} || 'XYZ';
 
+    # adjust the scale of the items. we assume the scale is 1 unit (inch, mm, cm, etc), but you may want to do 1/2 unit scale in which case the scale is 2
+    # we use floor here because you can't fit a big item into a small hole, better to err on the side of the box being small rather than big
+    my $x = floor($args{x} * $scale);
+    my $y = floor($args{y} * $scale);
+    my $z = floor($args{z} * $scale);
+ 
     # sort small to large
 	( $x, $y, $z ) = sort { $a <=> $b } ( $x, $y, $z );
     
     # do the initial rotation
     ( $x, $y, $z ) = xyz_rotate($rotation, $x, $y, $z);
-
-    # adjust the scale of the items. we assume the scale is 1 unit (inch, mm, cm, etc), but you may want to do 1/2 unit scale in which case the scale is 2
-	( $x, $y, $z ) = map { $_ * $scale } ( $x, $y, $z );
-    
-    # we use floor here because you can't fit a big item into a small hole, better to err on the side of the box being small rather than big
-    $x = floor($x);
-    $y = floor($y);
-    $z = floor($z);
 
     # initialize 3D space    
     my @space = ();
@@ -139,6 +135,7 @@ around BUILDARGS => sub {
 sub BUILD {
     my $self = shift;
     foreach my $cursor_type ( @{ $self->cursor_types } ) {
+        warn $cursor_type;
         $self->cursors->{$cursor_type} = Shipping::BoxSize::Cursor->new;
 	} 
 };

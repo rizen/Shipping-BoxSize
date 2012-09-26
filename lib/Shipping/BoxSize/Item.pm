@@ -50,11 +50,14 @@ has scale => (
 
 around BUILDARGS => sub {
     my ($orig, $class, %args) = @_;
-    my $x = $args{x};
-    my $y = $args{y};
-    my $z = $args{z};
     my $rotation = $args{rotation} || 'XYZ';
     my $scale = $args{scale} || 1;
+
+    # adjust the scale of the items. we assume the scale is 1 unit (inch, mm, cm, etc), but you may want to do 1/2 unit scale in which case the scale is 2
+    # we use ceil here because you can't fit a big item into a small hole, better to err on the item being big rather than small
+    my $x = ceil($args{x} * $scale);
+    my $y = ceil($args{y} * $scale);
+    my $z = ceil($args{z} * $scale);
     
     # sort small to large
 	( $x, $y, $z ) = sort { $a <=> $b } ( $x, $y, $z );
@@ -62,14 +65,6 @@ around BUILDARGS => sub {
     # do the initial rotation
     ( $x, $y, $z ) = xyz_rotate($rotation, $x, $y, $z);
 
-    # adjust the scale of the items. we assume the scale is 1 unit (inch, mm, cm, etc), but you may want to do 1/2 unit scale in which case the scale is 2
-	( $x, $y, $z ) = map { $_ * $scale } ( $x, $y, $z );
-    
-    # we use ceil here because you can't fit a big item into a small hole, better to err on the item being big rather than small
-    $x = ceil($x);
-    $y = ceil($y);
-    $z = ceil($z);
-    
     return {
         x       => $x,
         y       => $y,
