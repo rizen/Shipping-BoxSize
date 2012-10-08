@@ -75,7 +75,7 @@ sub add_box {
 sub start_packing {
     my $self = shift;
     my @overflow = ();
-    my $box = $self->boxes->[0]->clone; # TODO: get a box from the list, more than just the first one
+    my $box = $self->boxes->[0]; # TODO: get a box from the list, more than just the first one
     foreach my $item (@{$self->sort_items}) {
         unless ( $self->pack_item_in_box($box, $item) ) {
             push @overflow, $item;
