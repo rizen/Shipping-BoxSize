@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Any::Moose;
 use POSIX qw/floor/;
-use Shipping::BoxSize::Utility qw/xyz_rotate/;
+use Shipping::BoxSize::Utility qw/xyz_rotate reverse_xyz_rotate/;
 use Storable qw(dclone);
 use Shipping::BoxSize::Cursor;
 use Data::GUID;
@@ -236,6 +236,10 @@ sub can_item_fit { #    Only searches in positive direction.
 	if ( $self->are_stats_enabled ) {
 		$self->increment_stats(cells_scanned_item => $stat_cell_count );
 	}
+    
+    unless ($can_fit) {
+        warn $item->id . ' cannot fit in box '.$self->id. ' using rotation '.$rotation;
+    }
 
 	return $can_fit;
 }
@@ -266,9 +270,9 @@ sub update_cursors {
 	}
 
     CURSOR_TYPE: foreach my $cursor_type ( @{ $self->cursor_types } ) {
-		my $this_cursor = $self->cursor->{$cursor_type};
+		my $this_cursor = $self->cursors->{$cursor_type};
 		my ( $cursor_x, $cursor_y, $cursor_z ) = $this_cursor->location;
-		if ( $space[$cursor_x][$cursor_y][$cursor_z] == 0 ) {
+		if ( $space[$cursor_x][$cursor_y][$cursor_z] eq 0 ) {
 			next CURSOR_TYPE;    # nothing to change with this one
 		}
 		$stat_count_moves++;
@@ -294,7 +298,7 @@ sub update_cursors {
 					( $x, $y, $z ) = reverse_xyz_rotate( $cursor_type, $inner, $middle, $outer );
 					$stat_count_cells++;
 
-					if ( $space[$x][$y][$z] == 0 ) { # found a open spot, need to set the right XYZ spot
+					if ( $space[$x][$y][$z] eq 0 ) { # found a open spot, need to set the right XYZ spot
                         $this_cursor->location($x, $y, $z);
 						next CURSOR_TYPE;
 					}
