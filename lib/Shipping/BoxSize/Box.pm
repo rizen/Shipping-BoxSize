@@ -7,6 +7,7 @@ use POSIX qw/floor/;
 use Shipping::BoxSize::Utility qw/xyz_rotate/;
 use Storable qw(dclone);
 use Shipping::BoxSize::Cursor;
+use Data::GUID;
 
 has cursor_types => (
     default     => sub { [qw(YXZ YZX XYZ ZXY)] },
@@ -20,9 +21,10 @@ has cursors => (
 );
 
 has id => (
-    required    => 1,
     is          => 'rw',
-    isa         => 'Str',
+    isa         => 'Str | Undef',
+    lazy        => 1,
+    default     => sub { Data::GUID->new->as_string },
 );
 
 has x => (

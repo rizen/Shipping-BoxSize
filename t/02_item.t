@@ -13,6 +13,7 @@ isa_ok $item, 'Shipping::BoxSize::Item';
 is $item->x, 2, 'x defaults to 2';
 is $item->y, 3, 'y defaults to 3';
 is $item->z, 7, 'z defaults to 7';
+is $item->id, 'test', 'overriding the default id';
 
 is $item->volume, 3*7*2, 'volume';
 
@@ -28,6 +29,8 @@ is $scaled->x, 5, 'scaled x defaults to 5';
 is $scaled->y, 7, 'scaled y defaults to 7';
 is $scaled->z, 16, 'scaled z defaults to 16';
 
+my $def_item = Shipping::BoxSize::Item->new(x => 1, y => 1, z => 1);
+isnt $def_item->id, '', 'id is assigned to an item if not passed in';
 
 done_testing;
 

@@ -5,11 +5,13 @@ use warnings;
 use Any::Moose;
 use POSIX qw/ceil/;
 use Shipping::BoxSize::Utility qw/xyz_rotate/;
+use Data::GUID;
 
 has id => (
     is          => 'rw',
-    required    => 1,
-    isa         => 'Str',
+    isa         => 'Str | Undef',
+    lazy        => 1,
+    default     => sub {Data::GUID->new->as_string()},
 );
 
 has x => (
@@ -70,9 +72,9 @@ around BUILDARGS => sub {
         y       => $y,
         z       => $z,
         volume  => ($x * $y * $z),
-        id      => $args{id},
         scale   => $scale,
         rotation=> $rotation,
+        id      => $args{id},
     };
 };
 

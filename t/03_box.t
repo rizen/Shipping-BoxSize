@@ -12,9 +12,9 @@ my $box = Shipping::BoxSize::Box->new(x => 3, y => 7, z => 2, id => 'test');
 
 isa_ok $box, 'Shipping::BoxSize::Box';
 
-is $box->x, 2, 'x defaults to 2';
-is $box->y, 3, 'y defaults to 3';
-is $box->z, 7, 'z defaults to 7';
+is $box->x, 2, 'x defaults to 2, sorted';
+is $box->y, 3, 'y defaults to 3, sorted';
+is $box->z, 7, 'z defaults to 7, sorted';
 
 is $box->volume_remaining, 3*7*2, 'volume_remaining';
 
@@ -31,6 +31,9 @@ is scalar(@{$box->packing_list}), 0, 'packing_list initialized';
 is $box->big_side_area, 3*7, 'big_side_area';
 
 is $box->decrease_volume_remaining(5), ((3 * 7 * 2) - 5), 'decrease_volume_remaining';
+
+my $default_box = Shipping::BoxSize::Box->new(x => 2, y => 2, z => 8);
+isnt $default_box->id, '', 'box has an autocreated id when none is passed';
 
 my $clone = $box->clone;
 cmp_deeply $clone, $box, 'clone';
@@ -52,6 +55,7 @@ ok $box->can_item_fit($just_right, 'XYZ', $box->cursors->{XYZ}), 'can_item_fit t
 
 # TODO
 # update_cursors
+
 # write_item
 
 ok exists $box->cursors->{'YXZ'}, 'Box has a YZX cursor';
