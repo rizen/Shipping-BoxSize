@@ -10,7 +10,7 @@ use_ok 'Shipping::BoxSize';
 
 my $sizer = Shipping::BoxSize->new(enable_stats => 1);
 
-$sizer->add_box(x => 12, y => 12, z => 12, id => 'big cube', scale => 2);
+$sizer->add_box(x => 12, y => 12, z => 12, id => 'big cube', scale => 4);
 
 $sizer->add_item(x => 10.75, y => 10.75, z => 1.75, id => 'A');
 $sizer->add_item(x => 10.75, y => 10.75, z => 1.75, id => 'B');

@@ -209,7 +209,7 @@ sub sort_items {
         my $sort_method = $self->sort_method;
 		push( @{ $buffer{$item->$sort_method} }, $item );
 	}
-	foreach my $value ( sort { $b <=> $a } keys %buffer ) {
+	foreach my $value ( sort { $b <=> $a } keys %buffer ) { # schwartzian transform would make this better
 		push( @return, @{ $buffer{$value} } );
 	}
 	return \@return;
