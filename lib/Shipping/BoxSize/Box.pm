@@ -336,7 +336,6 @@ sub write_item {
 	my @space = @{ $self->space };
 	my ( $max_x,     $max_y,     $max_z )     = $self->dimensions;
 	my ( $itemMax_x, $itemMax_y, $itemMax_z ) = $item->dimensions;
-	my $itemVolume = $item->volume;
 	if ( $rotation and $rotation ne 'XYZ' ) {
 		( $itemMax_x, $itemMax_y, $itemMax_z ) = xyz_rotate( $rotation, $itemMax_x, $itemMax_y, $itemMax_z );
 	}
@@ -352,6 +351,7 @@ sub write_item {
 		while ( $x < $itemMax_x + $cur_x and $x < $max_x ) {
 			$z = $cur_z;
 			while ( $z < $itemMax_z + $cur_z and $z < $max_z ) {
+                warn "WRITING $item_id at $x $y $z";
 				$space[$x][$y][$z] = $item_id;
 				$z++;
 			}
@@ -359,7 +359,7 @@ sub write_item {
 		}
 		$y++;
 	}
-	$self->decrease_volume_remaining($itemVolume );
+	$self->decrease_volume_remaining($item->volume);
 	if ( $self->are_stats_enabled ) {
 		$self->increment_stats( items => 1 );
 	}

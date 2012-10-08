@@ -77,7 +77,7 @@ sub start_packing {
     my @overflow = ();
     my $box = $self->boxes->[0]->clone; # TODO: get a box from the list, more than just the first one
     foreach my $item (@{$self->sort_items}) {
-        if ( $self->pack_item_in_box($box, $item) ) {
+        unless ( $self->pack_item_in_box($box, $item) ) {
             push @overflow, $item;
             my ( $x, $y, $z ) = $item->dimensions;
             my $id = $item->id;
@@ -231,6 +231,7 @@ sub print_stats {
 	print "   Box Cursors: " . join( ',', @{$box->cursor_types} ) . "\n";
 	print "   Item Rotate: " . join( ',', @{$self->rotate_order} ) . "\n";
 	print "STATS: \n";
+    print "   total volume = $total\n";
 	print "   remaining volume = $remaining\n";
 	print "   percent full = "
 	  . int( ( 1 - $remaining / $total ) * 100 ) . "%\n";
