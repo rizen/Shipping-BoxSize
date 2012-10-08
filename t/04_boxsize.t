@@ -25,7 +25,7 @@ $sizer->add_item(x => 2.5, y => 3.5, z => 1, id => 'J');
 $sizer->add_item(x => 10.75, y => 10.75, z => 1.75, id => 'K');
 $sizer->add_item(x => 10.75, y => 10.75, z => 1.75, id => 'L');
 $sizer->add_item(x => 1, y => 0.5, z => 0.5, id => 'M');
-$sizer->add_item(x => 0.75, y => 0.75, z => 0.75, id => 'N');
+$sizer->add_item(x => 0.75, y => 0.75, z => 0.75);
 
 $sizer->start_packing;
 

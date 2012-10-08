@@ -92,6 +92,7 @@ sub start_packing {
 #  Place item in box, returns 0 if it can not fit in box
 sub pack_item_in_box {
     my ($self, $box, $item) = @_;
+    warn "packing item ".$item->id;
 
 	my %duplicate         = ();
 	my $location          = '';
@@ -110,26 +111,38 @@ sub pack_item_in_box {
 		return 0;
 	}
 
+    warn "Strategy: ".$self->strategy;
 	if ( $self->strategy eq 'TryAllSpots_ThenNextRotation' ) {
 
 		# Iterate over rotations slowly
         ROTATION: foreach $item_rotation (@{$self->rotate_order}) {
-			next if ( !$item_rotation );
+            if ( !$item_rotation ) {
+                warn "empty rotation";
+                next;
+            }
+            warn "Rotation: $item_rotation";
 
 			# Try All Cursor Spots
 			$stat_count_rotation++;
 			my $stat_count_cursor = 0;
             CURSOR: foreach $cursor_type ( @{ $box->cursor_types } ) {
-				next if ( !$cursor_type );
+				if ( !$cursor_type ) {
+                    warn "empty cursor";
+                    next;
+                }
+                warn "Cursor Type: $cursor_type";
 				$this_cursor = $box->cursors->{$cursor_type};
 				$location    = $this_cursor->location_as_string;
-				next if ( $duplicate{$location} );    # some cursors are stacked in same spot
-
+				if ( $duplicate{$location} ) {
+                    warn "duplicate location"; # some cursors are stacked in same spot
+                    next;
+                }
 				$stat_count_cursor++;
 
 				if ( $box->can_item_fit($item, $item_rotation, $this_cursor ) ) {
 					$box->write_item($item, $item_rotation, $this_cursor );
 					$pack_it = 1;
+                    warn "can pack it";
 					last ROTATION;    #end both loops
 				}
 			}
@@ -142,7 +155,10 @@ sub pack_item_in_box {
 		# Assume default ($ITEM_STRATEGY eq ''TryAllRotations_ThenNextCursor'')
 		# Iterate over cursors slowly
         CURSOR: foreach $cursor_type ( @{ $box->cursor_types } ) {
-			next if ( !$cursor_type );
+			if ( !$cursor_type ) {
+                warn "empty cursor";
+                next;
+            }
 			$this_cursor = $box->cursors->{$cursor_type};
 			$location    = $this_cursor->location;
 			next if ( $duplicate{$location}  );    # some cursors are stacked in same spot
@@ -216,15 +232,18 @@ sub print_stats {
 	}
 
 	# special stats
-	print "AVERAGES: \n";
-	print "    Excess Scans/Item: "
-	  . ( $stats->{cells_scanned_item} - $used_vol ) / $stats->{items}
-	  . "\n";
-	print "    Rotations Checked/Item: "
-	  . ( $stats->{item_rotations} ) / $stats->{items} . "\n";
-	print "    Cursors Checked/Item: "
-	  . ( $stats->{cursor_tests} ) / $stats->{items} . "\n";
-	print "    Vol/Item: " . $used_vol / $stats->{items} . "\n";
+    my $item_count = $stats->{items};
+    if ($item_count) {
+        print "AVERAGES: \n";
+        print "    Excess Scans/Item: "
+          . ( $stats->{cells_scanned_item} - $used_vol ) / $stats->{items}
+          . "\n";
+        print "    Rotations Checked/Item: "
+          . ( $stats->{item_rotations} ) / $stats->{items} . "\n";
+        print "    Cursors Checked/Item: "
+          . ( $stats->{cursor_tests} ) / $stats->{items} . "\n";
+        print "    Vol/Item: " . $used_vol / $stats->{items} . "\n";
+    }
 }
 
 
