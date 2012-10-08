@@ -1,0 +1,5 @@
+We stopped working on this for several reasons:
+
+1) Output and behavior did not match pack2.pl
+2) It's really hard to describe to crafters how to do the packing.
+3) It's hard to debug this, we need some kind of visualization tool, like PDL, octave, gnuplot.
