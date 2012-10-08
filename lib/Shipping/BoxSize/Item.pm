@@ -9,7 +9,7 @@ use Data::GUID;
 
 has id => (
     is          => 'rw',
-    isa         => 'Str | Undef',
+    isa         => 'Str',
     lazy        => 1,
     default     => sub {Data::GUID->new->as_string()},
 );
@@ -52,7 +52,6 @@ has scale => (
 
 around BUILDARGS => sub {
     my ($orig, $class, %args) = @_;
-    my $rotation = $args{rotation} || 'XYZ';
     my $scale = $args{scale} || 1;
 
     # adjust the scale of the items. we assume the scale is 1 unit (inch, mm, cm, etc), but you may want to do 1/2 unit scale in which case the scale is 2
@@ -65,17 +64,15 @@ around BUILDARGS => sub {
 	( $x, $y, $z ) = sort { $a <=> $b } ( $x, $y, $z );
     
     # do the initial rotation
-    ( $x, $y, $z ) = xyz_rotate($rotation, $x, $y, $z);
+    ( $x, $y, $z ) = xyz_rotate($args{rotation}, $x, $y, $z);
+    $args{x} = $x;
+    $args{y} = $y;
+    $args{z} = $z;
+    $args{volume}     = $x * $y * $z;
+    $args{rotation} ||= 'XYZ';
+    $args{scale}    ||= 1;
 
-    return {
-        x       => $x,
-        y       => $y,
-        z       => $z,
-        volume  => ($x * $y * $z),
-        scale   => $scale,
-        rotation=> $rotation,
-        id      => $args{id},
-    };
+    return \%args;
 };
 
 sub dimensions {
