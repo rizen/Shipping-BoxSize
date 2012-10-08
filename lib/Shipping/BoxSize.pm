@@ -159,18 +159,27 @@ sub pack_item_in_box {
                 warn "empty cursor";
                 next;
             }
+            warn "Cursor Type: ".$cursor_type;
 			$this_cursor = $box->cursors->{$cursor_type};
 			$location    = $this_cursor->location;
-			next if ( $duplicate{$location}  );    # some cursors are stacked in same spot
+			if ( $duplicate{$location}  ) {
+                warn "duplicate location"; # some cursors are stacked in same spot
+                next;
+            }
 
 			# Try All Rotations First
 			$stat_count_cursor++;
 			$stat_count_rotation = 0;
             ROTATION: foreach $item_rotation (@{$self->rotate_order}) {
-				next if ( !$item_rotation );
+				if ( !$item_rotation ) {
+                    warn "empty rotation";
+                    next;
+                }
+                warn "Rotation: $item_rotation";
 				if ( $box->can_item_fit( $item, $item_rotation, $this_cursor ) ) {
 					$box->write_item($item, $item_rotation, $this_cursor );
 					$pack_it = 1;
+                    warn "can pack it";
 					last CURSOR;    #end both loops
 				}
 				$stat_count_rotation++;
