@@ -277,7 +277,7 @@ sub update_cursors {
 
 		my ( $inner_max, $middle_max, $outer_max ) = xyz_rotate( $cursor_type, $box_x, $box_y, $box_z );
 
-        my ($x, $y, $z) = 0;
+        my ($x, $y, $z);
 		while ( $outer < $outer_max ) {
 			while ( $middle < $middle_max ) {
 				while ( $inner < $inner_max ) {
