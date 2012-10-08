@@ -4,6 +4,7 @@ use Test::Deep;
 use lib '../lib';
 use 5.010;
 use Shipping::BoxSize::Item;
+use strict;
 
 use_ok 'Shipping::BoxSize::Box';
 
@@ -51,8 +52,20 @@ ok $box->can_item_fit($just_right, 'XYZ', $box->cursors->{XYZ}), 'can_item_fit t
 
 # TODO
 # update_cursors
-# delete_cursor
 # write_item
+
+ok exists $box->cursors->{'YXZ'}, 'Box has a YZX cursor';
+cmp_deeply $box->cursor_types, [qw(YXZ YZX XYZ ZXY)], 'checking default set of cursor_types';
+$box->cursors->{'YXZ'}->id('YXZ');
+
+my $cursor = $box->delete_cursor('YXZ');
+
+isa_ok $cursor, 'Shipping::BoxSize::Cursor';
+is $cursor->id, 'YXZ', 'Deleted cursor has the right id';
+
+ok ! exists $box->cursors->{'YXZ'}, 'YZX cursor was deleted from the set of cursors in the box';
+cmp_deeply $box->cursor_types, [qw(YZX XYZ ZXY)], 'checking update of cursor_types';
+
 
 # test scaling
 

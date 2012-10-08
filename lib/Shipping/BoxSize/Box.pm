@@ -277,7 +277,7 @@ sub update_cursors {
 
 		my ( $inner_max, $middle_max, $outer_max ) = xyz_rotate( $cursor_type, $box_x, $box_y, $box_z );
 
-		my ( $x, $y, $z ) = 0;
+        my ($x, $y, $z) = 0;
 		while ( $outer < $outer_max ) {
 			while ( $middle < $middle_max ) {
 				while ( $inner < $inner_max ) {
@@ -315,7 +315,7 @@ sub update_cursors {
 
 sub delete_cursor {
 	my ( $self, $cursor_type ) = @_;
-	$self->cursor_types(grep( !/^$cursor_type$/, @{ $self->cursor_types}));
+	$self->cursor_types([ grep( !/^$cursor_type$/, @{ $self->cursor_types} ) ]);
 	delete $self->cursors->{$cursor_type};
 }
 
