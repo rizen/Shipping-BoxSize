@@ -45,6 +45,12 @@ has z => (
     isa         => 'Int',
 );
 
+has volume => (
+    is          => 'rw',
+    required    => 1,
+    isa         => 'Num',
+);
+
 has volume_remaining => (
     is          => 'rw',
     required    => 1,
@@ -120,12 +126,14 @@ around BUILDARGS => sub {
 		}
 		$x_iterator++;
 	}
+    my $volume = $x * $y * $z;
     
     return {
         x                   => $x,
         y                   => $y,
         z                   => $z,
-        volume_remaining    => ($x * $y * $z),
+        volume              => $volume,
+        volume_remaining    => $volume,
         id                  => $args{id},
         space               => \@space,
         enable_stats        => $args{enable_stats} || 0,
@@ -357,7 +365,6 @@ sub write_item {
 
     $self->update_cursors( $item, $rotation );
 }
-
 
 
 
