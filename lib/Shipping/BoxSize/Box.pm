@@ -22,7 +22,7 @@ has cursors => (
 
 has id => (
     is          => 'rw',
-    isa         => 'Str | Undef',
+    isa         => 'Str',
     lazy        => 1,
     default     => sub { Data::GUID->new->as_string },
 );
@@ -97,7 +97,6 @@ has packing_list => (
 around BUILDARGS => sub {
     my ($orig, $class, %args) = @_;
     my $scale = $args{scale} || 1;
-    my $rotation = $args{rotation} || 'XYZ';
 
     # adjust the scale of the items. we assume the scale is 1 unit (inch, mm, cm, etc), but you may want to do 1/2 unit scale in which case the scale is 2
     # we use floor here because you can't fit a big item into a small hole, better to err on the side of the box being small rather than big
@@ -108,8 +107,9 @@ around BUILDARGS => sub {
     # sort small to large
 	( $x, $y, $z ) = sort { $a <=> $b } ( $x, $y, $z );
     
+    $args{rotation} ||= 'XYZ';
     # do the initial rotation
-    ( $x, $y, $z ) = xyz_rotate($rotation, $x, $y, $z);
+    ( $x, $y, $z ) = xyz_rotate($args{rotation}, $x, $y, $z);
 
     # initialize 3D space    
     my @space = ();
@@ -127,19 +127,16 @@ around BUILDARGS => sub {
 		$x_iterator++;
 	}
     my $volume = $x * $y * $z;
-    
-    return {
-        x                   => $x,
-        y                   => $y,
-        z                   => $z,
-        volume              => $volume,
-        volume_remaining    => $volume,
-        id                  => $args{id},
-        space               => \@space,
-        enable_stats        => $args{enable_stats} || 0,
-        scale               => $scale,
-        rotation            => $rotation,
-    };
+
+    $args{x} = $x;
+    $args{y} = $y;
+    $args{z} = $z;
+    $args{volume} = $volume;
+    $args{volume_remaining} = $volume;
+    $args{space} = \@space;
+    $args{scale} = $scale;
+
+    return \%args;
 };
 
 sub BUILD {

@@ -33,7 +33,7 @@ is $box->big_side_area, 3*7, 'big_side_area';
 is $box->decrease_volume_remaining(5), ((3 * 7 * 2) - 5), 'decrease_volume_remaining';
 
 my $default_box = Shipping::BoxSize::Box->new(x => 2, y => 2, z => 8);
-isnt $default_box->id, '', 'box has an autocreated id when none is passed';
+cmp_ok length($default_box->id), '>', 0, 'box has an autocreated id when none is passed';
 
 my $clone = $box->clone;
 cmp_deeply $clone, $box, 'clone';
