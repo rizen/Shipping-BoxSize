@@ -3,11 +3,14 @@ package Shipping::BoxSize;
 use strict;
 use warnings;
 use Any::Moose;
+use Moose::Util::TypeConstraints;
+use Shipping::BoxSize::Box;
+use Shipping::BoxSize::Item;
 
 has start_rotation => (
     is          => 'rw',
     default     => 'YXZ', # Y is smallest side, Z is longest (ie flat side down)
-    isa         => 'Scalar',
+    isa         => 'Str',
 );
 
 has enable_stats => (
@@ -20,23 +23,23 @@ has scale => (
     is          => 'rw',
     isa         => 'Int',
     default     => 1,
-)
+);
 
 has sort_method => (
     is          => 'rw',
-    default     => 'volume'
-    isa         => subtype( 'Scalar' => where { $_ ~~ [qw(volume big_side_area)] } )
+    default     => 'volume',
+    isa         => subtype( 'Str' => where { $_ ~~ [qw(volume big_side_area)] } ),
 );
 
 has strategy => (
     is          => 'rw',
-    default     => 'TryAllRotations_ThenNextCursor'
-    isa         => subtype( 'Scalar' => where { $_ ~~ [qw(TryAllRotations_ThenNextCursor TryAllSpots_ThenNextRotation)] } )
+    default     => 'TryAllRotations_ThenNextCursor',
+    isa         => subtype( 'Str' => where { $_ ~~ [qw(TryAllRotations_ThenNextCursor TryAllSpots_ThenNextRotation)] } )
 );
 
 has rotate_order => (
     is          => 'rw',
-    default     => sub { qw(XYZ YXZ XZY YZX) },
+    default     => sub { [qw(XYZ YXZ XZY YZX)] },
     isa         => 'ArrayRef',
 );
 
@@ -57,6 +60,7 @@ sub add_item {
 has boxes => (
     default => sub { [] },
     isa     => 'ArrayRef',
+    is      => 'rw',
 );
 
 sub add_box {
@@ -77,7 +81,7 @@ sub start_packing {
             push @overflow, $item;
             my ( $x, $y, $z ) = $item->dimensions;
             my $id = $item->id;
-            print "boxPackItem failed for item:$id size ($x,$y,$z)\n";
+            print "pack_item_in_box failed for item:$id size ($x,$y,$z)\n";
             print "=============================\n";
         }
         else {
@@ -87,7 +91,7 @@ sub start_packing {
 
 #  Place item in box, returns 0 if it can not fit in box
 sub pack_item_in_box {
-    my ($self, $box, $item)
+    my ($self, $box, $item) = @_;
 
 	my %duplicate         = ();
 	my $location          = '';
@@ -146,7 +150,7 @@ sub pack_item_in_box {
 			# Try All Rotations First
 			$stat_count_cursor++;
 			$stat_count_rotation = 0;
-            ROTATION: foreach $item_rotation (@ITEM_ROTATE_ORDER) {
+            ROTATION: foreach $item_rotation (@{$self->rotate_order}) {
 				next if ( !$item_rotation );
 				if ( $box->can_item_fit( $item, $item_rotation, $this_cursor ) ) {
 					$box->write_item($item, $item_rotation, $this_cursor );
